@@ -1,0 +1,123 @@
+use reflection;
+
+class Test {
+    func Test(self) {
+        self.results = {};
+        self.preTasks = [];
+        self.postTasks = [];
+    }
+
+    func it(self, name, block) {
+        foreach (task in self.preTasks) {
+            task();
+        }
+
+        fail = false;
+        msg = null;
+
+        try {
+            block();
+        } except (e) {
+            fail = true;
+            msg = e.message;
+        }
+
+        self.results[name] = (fail, msg);
+
+        foreach (task in self.postTasks) {
+            task();
+        }
+    }
+
+    func beforeEach(self, block) {
+        self.preTasks.add(block);
+    }
+
+    func afterEach(self, block) {
+        self.postTasks.add(block);
+    }
+}
+
+func describe(name, block) {
+    testObj = Test();
+    print(name);
+    try {
+        block(testObj);
+    } except (e) {
+        print('    failure in espresso! report this: ' + e.message);
+    }
+
+    fails = 0;
+    foreach(test in testObj.results) {
+        result = testObj.results[test];
+        if (!result[0]) {
+            print('    {} [✓]'.format(test));
+        } else {
+            print('    {} [✗] - {}'.format(test, result[1]));
+            fails += 1;
+        }
+    }
+
+    print('');
+    print('    Summary of "{}":'.format(name));
+    print('    {} passes'.format(testObj.results.getSize() - fails));
+    print('    {} failures'.format(fails));
+}
+
+class AssertionException : Exception {
+    func AssertionException(self, message) {
+        super(message);
+    }
+}
+
+class Expect {
+    func Expect(self, obj) {
+        self.obj = obj;
+        # .to doesn't actually do anything
+        self.to = self;
+        self.negate = false;
+    }
+
+    func not(self) {
+        self.negate = true;
+        return self;
+    }
+
+    func equal(self, value) {
+        test = self.obj.typeDef == value.typeDef && self.obj == value;
+        if (self.negate) {
+            test = !test;
+        }
+
+        if (!test) {
+            raise AssertionException('expected {}, but got {}!'.format(value, self.obj));
+        }
+    }
+
+    func haveAttribute(self, attr) {
+        test = reflection.hasAttribute(self.obj, attr);
+        if (self.negate) {
+            test = !test;
+        }
+
+        if (!test) {
+            raise AssertionException('expected {} to have attribute {}'.format(self.obj, attr));
+        }
+    }
+
+    func beNull(self) {
+        test = self.obj == null;
+
+        if (self.negate) {
+            test = !test;
+        }
+
+        if (!test) {
+            raise AssertionException('expected {} to be null or undefined'.format(self.obj));
+        }
+    }
+}
+
+func expect(obj) {
+    return Expect(obj);
+}

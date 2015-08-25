@@ -1,0 +1,52 @@
+use describe, expect from .espresso;
+
+class FakeTest {
+    # Test class.
+}
+
+describe('espresso', lambda(test) => {
+    describe('equal', lambda(test) => {
+        test.it('should successfully compare two equal integers', lambda() => {
+            expect(5).to.equal(5);
+        });
+
+        test.it('should fail with different types', lambda() => {
+            expect(5).to.not().equal('5');
+        });
+
+        test.it('should successfully compare two equal hashmaps', lambda() => {
+            expect({'x': 1}).to.equal({'x': 1});
+        });
+
+        test.it('should fail to compare two objects (different references)', lambda() => {
+            a = FakeTest();
+            b = FakeTest();
+            expect(a).not().to.equal(b);
+        });
+
+        test.it('should successfully compare two equal lists', lambda() => {
+            expect([1, 2, 3]).to.equal([1, 2, 3]);
+        });
+    });
+
+    describe('not', lambda(test) => {
+        test.it('should negate an equal', lambda() => {
+            expect(2).not().to.equal(3);
+        });
+
+        test.it('should work both in .not().to and to.not()', lambda() => {
+            expect('Iodine').not().to.equal('C#');
+            expect('Iodine').to.not().equal('C++');
+        });
+    });
+
+    describe('beNull', lambda(test) => {
+        test.it('should pass if object is null', lambda() => {
+            expect(null).to.beNull();
+        });
+
+        test.it('should pass if not is used with a non-null value', lambda() => {
+            expect('test').not().to.beNull();
+        });
+    });
+});
