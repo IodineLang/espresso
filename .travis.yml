@@ -4,3 +4,5 @@ addons:
   apt:
     packages:
       - mono-complete
+    sources:
+      - http://download.mono-project.com/repo/debian wheezy main
