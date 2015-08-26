@@ -160,4 +160,68 @@ describe('espresso', lambda(test) => {
             expect(1).to.be.an('Int');
         });
     });
+
+    test.describe('above', lambda(test) => {
+        test.it('should pass if object is greater', lambda() => {
+            expect(2).to.be.above(1);
+        });
+
+        test.it('should fail is object is less', lambda() => {
+            expect(1).not().to.be.above(2);
+        });
+
+        test.it('should fail if type is not Int', lambda() => {
+            expect('5').not().to.be.above(4);
+        });
+    });
+
+    test.describe('below', lambda(test) => {
+        test.it('should pass if object is less', lambda() => {
+            expect(1).to.be.below(2);
+        });
+
+        test.it('should fail if the object is more', lambda() => {
+            expect(5).not().to.be.below(4);
+        });
+
+        test.it('should fail if type is not Int', lambda() => {
+            expect('5').not().to.be.below(6);
+        });
+    });
+
+    test.describe('at', lambda(test) => {
+        test.it('should be the same as the Expect object', lambda() => {
+            e = expect(1);
+            expect(e).to.equal(e.at);
+        });
+    });
+
+    test.describe('most', lambda(test) => {
+        test.it('should pass if object is <= value', lambda() => {
+            expect(5).to.be.at.most(5);
+        });
+
+        test.it('should fail if object is > value', lambda() => {
+            expect(5).not().to.be.at.most(4);
+        });
+
+        test.it('should fail if object is not an Int', lambda() => {
+            expect('5').not().to.be.at.most(6);
+        });
+    });
+
+    test.describe('least', lambda(test) => {
+        test.it('should pass if object is >= value', lambda() => {
+            expect(5).to.be.at.least(5);
+            expect(6).to.be.at.least(-1);
+        });
+
+        test.it('should fail if object is < value', lambda() => {
+            expect(4).not().to.be.at.least(5);
+        });
+
+        test.it('should fail if object is not an Int', lambda() => {
+            expect('5').not().to.be.at.least(4);
+        });
+    });
 });

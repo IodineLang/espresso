@@ -102,6 +102,7 @@ class Expect {
         self.to = self;
         self.be = self;
         self.have = self;
+        self.at = self;
         self.negateFlag = false;
     }
 
@@ -166,7 +167,8 @@ class Expect {
         }
 
         if (!self._runTest(test)) {
-            raise AssertionException('expected {} to have keys [{}]'.format(self.obj, ', '.join(values)));
+            raise AssertionException('expected {} to have keys [{}]'
+                .format(self.obj, ', '.join(values)));
         }
     }
 
@@ -175,6 +177,38 @@ class Expect {
         if (!self._runTest(test)) {
             raise AssertionException('expected {} to be a {}, but got {}'
                 .format(self.obj, type, self.obj.typeDef));
+        }
+    }
+
+    func above(self, value) {
+        test = self.obj.typeDef == value.typeDef && self.obj > value;
+        if (!self._runTest(test)) {
+            raise AssertionException('expected {} to be greater than {}'
+                .format(self.obj, value));
+        }
+    }
+
+    func below(self, value) {
+        test = self.obj.typeDef == value.typeDef && self.obj < value;
+        if (!self._runTest(test)) {
+            raise AssertionException('expected {} to be less than {}'
+                .format(self.obj, value));
+        }
+    }
+
+    func least(self, value) {
+        test = self.obj.typeDef == value.typeDef && self.obj >= value;
+        if (!self._runTest(test)) {
+            raise AssertionException('expected {} to be greater/equal to {}'
+                .format(self.obj, value));
+        }
+    }
+
+    func most(self, value) {
+        test = self.obj.typeDef == value.typeDef && self.obj <= value;
+        if (!self._runTest(test)) {
+            raise AssertionException('expected {} to be less/equal to {}'
+                .format(self.obj, value));
         }
     }
 
