@@ -1,4 +1,5 @@
 use reflection;
+use sys;
 
 class Test {
     func Test(self, indentLevel) {
@@ -79,6 +80,10 @@ func _describe(name, block, indent) {
     print('{}{} passes'.format(indentation, testObj.results.getSize() - fails));
     print('{}{} failures'.format(indentation, fails));
     print('');
+
+    if (fails > 0) {
+        sys.exit(fails);
+    }
 
     return testObj.results;
 }
