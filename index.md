@@ -40,3 +40,6 @@ Of course, so far, this code isn't much use. You can use the expressive
 behaviour-driven development and user stories.
 
 {% gist Aurora0000/49e138522bd1cab7434e %}
+
+Take a look at the [documentation](documentation/) for information on the
+`expect` function chains.
