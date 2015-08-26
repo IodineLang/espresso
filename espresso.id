@@ -132,13 +132,6 @@ class Expect {
         }
     }
 
-    func _true(self) {
-        test = self.obj.typeDef == true.typeDef && self.obj == true;
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {} to be true'.format(self.obj));
-        }
-    }
-
     func _false(self) {
         test = self.obj.typeDef == false.typeDef && self.obj == false;
         if (!self._runTest(test)) {
