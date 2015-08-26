@@ -3,4 +3,4 @@ script:
 addons:
   apt:
     packages:
-      - mono
+      - mono-complete
