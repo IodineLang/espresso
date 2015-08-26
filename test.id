@@ -1,11 +1,11 @@
-use describe, expect from .espresso;
+use describe, expect, InvalidTestException from .espresso;
 
 class FakeTest {
     # Test class.
 }
 
 describe('espresso', lambda(test) => {
-    describe('equal', lambda(test) => {
+    test.describe('equal', lambda(test) => {
         test.it('should successfully compare two equal integers', lambda() => {
             expect(5).to.equal(5);
         });
@@ -29,7 +29,7 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    describe('not', lambda(test) => {
+    test.describe('not', lambda(test) => {
         test.it('should negate an equal', lambda() => {
             expect(2).not().to.equal(3);
         });
@@ -40,13 +40,100 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    describe('beNull', lambda(test) => {
+    test.describe('to', lambda(test) => {
+        test.it('should be the same as expect', lambda() => {
+            e = expect(1);
+            expect(e).to.equal(e.to);
+        })
+    });
+
+    test.describe('be', lambda(test) => {
+        test.it('should be the same as expect', lambda() => {
+            e = expect(1);
+            expect(e).to.equal(e.be);
+        })
+    });
+
+    test.describe('have', lambda(test) => {
+        test.it('should be the same as expect', lambda() => {
+            e = expect(1);
+            expect(e).to.equal(e.have);
+        })
+    });
+
+    test.describe('_null', lambda(test) => {
         test.it('should pass if object is null', lambda() => {
-            expect(null).to.beNull();
+            expect(null).to.be._null();
         });
 
         test.it('should pass if not is used with a non-null value', lambda() => {
-            expect('test').not().to.beNull();
+            expect('test').not().to.be._null();
+        });
+    });
+
+    test.describe('attribute', lambda(test) => {
+        test.it('should pass if the object has the attribute', lambda() => {
+            expect('A string').to.have.attribute('substr');
+        });
+
+        test.it('should pass if .not() is used correctly', lambda() => {
+            expect('A string').not().to.have.attribute('fake');
+        });
+    });
+
+    test.describe('_true', lambda(test) => {
+        test.it('should pass if the object is true', lambda() => {
+            expect(true).to.be._true();
+        });
+
+        test.it('should pass if object is false and not is used', lambda() => {
+            expect(false).not().to.be._true();
+        });
+
+        test.it('should fail if the object is not boolean/truthy', lambda() => {
+            expect(1).not().to.be._true();
+        });
+    });
+
+    test.describe('_false', lambda(test) => {
+        test.it('should pass if the object is false', lambda() => {
+            expect(false).to.be._false();
+        });
+
+        test.it('should pass if object is true and not is used', lambda() => {
+            expect(true).not().to.be._false();
+        });
+
+        test.it('should fail if the object is not boolean/truthy', lambda() => {
+            expect(1).not().to.be._false();
+        });
+    });
+
+    test.describe('key', lambda(test) => {
+        test.it('should fail if the object is not a HashMap', lambda() => {
+            expect(1).not().to.have.key('yes');
+        });
+
+        test.it('should not index a string', lambda() => {
+            expect('test').not().to.have.key(1);
+        });
+
+        test.it('should pass if the key exists', lambda() => {
+            hashMap = {
+              'a': 1,
+              'x': 2
+            };
+            expect(hashMap).to.have.key('x');
+        });
+    });
+
+    test.describe('keys', lambda(test) => {
+        test.it('should fail if the object is not a HashMap', lambda() => {
+            expect(1).not().to.have.keys(1, 2);
+        });
+
+        test.it('should pass if all keys exist', lambda() => {
+            expect({'x': 1, 'y': 2}).to.have.keys('x', 'y');
         });
     });
 });
