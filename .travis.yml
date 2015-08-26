@@ -1,2 +1,6 @@
 script:
   - ./test.sh
+addons:
+  apt:
+    packages:
+      - apt
