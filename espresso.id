@@ -170,6 +170,18 @@ class Expect {
         }
     }
 
+    func a(self, type) {
+        test = Str(self.obj.typeDef) == Str(type);
+        if (!self._runTest(test)) {
+            raise AssertionException('expected {} to be a {}, but got {}'
+                .format(self.obj, type, self.obj.typeDef));
+        }
+    }
+
+    func an(self, type) {
+        self.a(type);
+    }
+
     func _runTest(self, test) {
         # True == pass
         # False == fail

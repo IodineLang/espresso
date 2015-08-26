@@ -136,4 +136,28 @@ describe('espresso', lambda(test) => {
             expect({'x': 1, 'y': 2}).to.have.keys('x', 'y');
         });
     });
+
+    test.describe('a', lambda(test) => {
+        test.it('should pass if the typeDefs match', lambda() => {
+            expect('A string').to.be.a('Str');
+        });
+
+        test.it('should pass if "not" is used correctly', lambda() => {
+            expect('A string').not().to.be.a('HashMap');
+        });
+
+        test.it('should be able to use the typeDef', lambda() => {
+            expect({}).to.be.a(HashMap().typeDef);
+        });
+
+        test.it('should work with classes', lambda() => {
+            expect(FakeTest()).to.be.a(FakeTest().typeDef);
+        });
+    });
+
+    test.describe('an', lambda(test) => {
+        test.it('should act the same as "a"', lambda() => {
+            expect(1).to.be.an('Int');
+        });
+    });
 });
