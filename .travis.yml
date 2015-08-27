@@ -1,2 +1,5 @@
 script:
   - ./test.sh
+language: csharp
+mono:
+  - latest
