@@ -48,7 +48,15 @@ class Test {
 }
 
 func describe(name, block) {
-    return _describe(name, block, 1);
+    results = _describe(name, block, 1);
+    failures = filter(results, lambda(result) => {
+        return results[result][0] == true;
+    });
+
+    if (failures.getSize() > 0) {
+        print('Build failed!');
+        sys.exit(failures.getSize());
+    }
 }
 
 func _describe(name, block, indent) {
@@ -80,10 +88,6 @@ func _describe(name, block, indent) {
     print('{}{} passes'.format(indentation, testObj.results.getSize() - fails));
     print('{}{} failures'.format(indentation, fails));
     print('');
-
-    if (fails > 0) {
-        sys.exit(fails);
-    }
 
     return testObj.results;
 }
