@@ -1,6 +1,4 @@
 script:
   - ./test.sh
-addons:
-  apt:
-    packages:
-      - mono-devel
+mono:
+  - latest
