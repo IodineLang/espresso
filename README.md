@@ -1,5 +1,5 @@
 # Espresso
-[![ion install espresso](https://img.shields.io/badge/ion%20install-espresso--dev-blue.svg)](https://github.com/IodineLang/Ion)
+[![ion install espresso](https://img.shields.io/badge/ion%20install-espresso-blue.svg)](https://github.com/IodineLang/Ion)
 ![version v1.0.0-rc.1](https://img.shields.io/badge/version-v1.0.0--rc.1-blue.svg)
 ![deps](https://img.shields.io/badge/dependencies-none-green.svg)
 [![Build Status](https://travis-ci.org/IodineLang/espresso.svg?branch=master)](https://travis-ci.org/IodineLang/espresso)
