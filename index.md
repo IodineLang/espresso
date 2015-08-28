@@ -15,7 +15,7 @@ We recommend that you use Ion to install Espresso, because it's fast, easy and
 avoids the common gotchas of installing Iodine packages.
 
 {% highlight bash %}
-$ ion install espresso-dev
+$ ion install espresso
 {% endhighlight %}
 
 [Other Installation Methods](install/)
