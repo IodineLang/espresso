@@ -1,8 +1,11 @@
-use describe, expect, InvalidTestException from src.espresso;
+use HTMLFrontend, describe, expect, InvalidTestException from
+    src.espresso;
 
 class FakeTest {
     # Test class.
 }
+
+espresso.FrontendManager.set(HTMLFrontend());
 
 describe('espresso', lambda(test) => {
     test.describe('equal', lambda(test) => {
@@ -11,7 +14,7 @@ describe('espresso', lambda(test) => {
         });
 
         test.it('should fail with different types', lambda() => {
-            expect(5).to.not().equal('5');
+            expect('5').to.not().equal('5');
         });
 
         test.it('should successfully compare two equal hashmaps', lambda() => {

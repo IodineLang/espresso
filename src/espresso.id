@@ -1,6 +1,192 @@
 use reflection;
 use sys;
 
+class ConciseConsoleFrontend : ConsoleFrontendBase, IFrontend {
+    func rootDescribeSummary(self, name, results) {
+        self.indent -= 1;
+        fails = 0;
+        foreach(test in results) {
+            result = results[test];
+            if (result != null) {
+                self._print('{} [✗] - {}'.format(test, result.message));
+                fails += 1;
+            }
+        }
+
+        passes = results.getSize() - fails;
+        if (self.indent == 0) {
+            self._print('Summary: ');
+        }
+
+        if (fails > 0) {
+            self._print('{} [{} ✓, {} ✗]'.format(name, passes, fails));
+        } else {
+            self._print('{} [{} ✓]'.format(name, passes));
+        }
+    }
+
+    func espressoError(self, e) {
+        self._print('There was a bug with espresso!');
+        self._print('{}: {}'.format(e.typeDef, e.message));
+        self._print('{}'.format(e.stackTrace));
+        sys.exit(-1);
+    }
+
+    func blockBegin(self, name) {
+        self.indent += 1;
+    }
+}
+
+class ConsoleFrontend : ConsoleFrontendBase, IFrontend {
+    func rootDescribeSummary(self, name, results) {
+        self.indent -= 1;
+        fails = 0;
+        foreach(test in results) {
+            result = results[test];
+            if (result == null) {
+                self._print('{} [✓]'.format(test));
+            } else {
+                self._print('{} [✗] - {}'.format(test, result.message));
+                fails += 1;
+            }
+        }
+
+        self._print('');
+        self._print('Summary of "{}":'.format(name));
+        self._print('{} passes'.format(results.getSize() - fails));
+        self._print('{} failures'.format(fails));
+        self._print('');
+    }
+
+    func espressoError(self, e) {
+        self._print('There was a bug with espresso!');
+        self._print('{}: {}'.format(e.typeDef, e.message));
+        self._print('{}'.format(e.stackTrace));
+        sys.exit(-1);
+    }
+
+    func blockBegin(self, name) {
+        self._print('{}:'.format(name));
+        self.indent += 1;
+    }
+}
+
+class HTMLFrontend : ConsoleFrontendBase, IFrontend {
+    func HTMLFrontend(self) {
+        super();
+        self.output = '';
+    }
+
+    func blockBegin(self, name) {
+        self.indent += 1;
+    }
+
+    func espressoError(self, e) {
+        self._print('There was a bug with espresso!');
+        self._print('{}: {}'.format(e.typeDef, e.message));
+        self._print('{}'.format(e.stackTrace));
+        sys.exit(-1);
+    }
+
+    func rootDescribeSummary(self, name, results) {
+        self.indent -= 1;
+        if (self.indent == 0) {
+            f = open('{}.html'.format(name), 'w');
+            data = '<!DOCTYPE html><html>';
+            data += '<head><title>Results for {}</title>'.format(name);
+            data += '<link href="https://maxcdn.bootstrapcdn.com/bootstrap/' +
+                '3.3.5/css/bootstrap.min.css" rel="stylesheet">';
+            data += '</head><body><div class="container">{}</div></body></html>'
+                .format(self.output);
+            f.write(data);
+            f.close();
+        } else {
+            self.output += '<h1>{}'.format(name);
+            self.output += '</h1>';
+            self.output += '<table class="table"><thead><th>Test</th>';
+            self.output += '<th>Result</th></thead>';
+            self.output += '<tbody>';
+            foreach (result in results) {
+                cls = 'success';
+                if (results[result] != null) {
+                    cls = 'danger';
+                }
+
+                self.output += '<tr class="{}">'.format(cls);
+                self.output += '<td>{}</td>'.format(result);
+                e = results[result];
+                if (e != null) {
+                    self.output += '<td>{} - {}<br> Stack: {}</td>'
+                        .format(e, e.message, e.stackTrace
+                        .replace('\n', '<br>'));
+                } else {
+                    self.output += '<td>Passed</td>';
+                }
+                self.output += '</tr>';
+            }
+
+            self.output += '</tbody></table>';
+        }
+    }
+}
+
+class ConsoleFrontendBase {
+    func ConsoleFrontendBase(self) {
+        self.indent = 0;
+    }
+
+    func _print(self, message) {
+        indentation = '';
+        for (i = 0; i < self.indent; i += 1) {
+            indentation += '    ';
+        }
+
+        print('{}{}'.format(indentation, message));
+    }
+
+    func _printIndent(self) {
+        indentation = '';
+        for (i = 0; i < self.indent; i += 1) {
+            indentation += '    ';
+        }
+
+        stdout.write(indentation);
+    }
+}
+
+interface IFrontend {
+    func rootDescribeSummary(self, name, results);
+    func espressoError(self, e);
+    func blockBegin(self, name);
+}
+
+class FrontendManager {
+    func _get() {
+        try {
+            return FrontendManager.frontend;
+        } except (e as AttributeNotFoundException) {
+            FrontendManager.frontend = ConsoleFrontend();
+            return FrontendManager.frontend;
+        }
+    }
+
+    func set(clazz) {
+        FrontendManager.frontend = clazz;
+    }
+
+    func rootDescribeSummary(name, results) {
+        FrontendManager._get().rootDescribeSummary(name, results);
+    }
+
+    func espressoError(e) {
+        FrontendManager._get().espressoError(e);
+    }
+
+    func blockBegin(name) {
+        FrontendManager._get().blockBegin(name);
+    }
+}
+
 class Test {
     func Test(self, indentLevel) {
         self.results = {};
@@ -21,17 +207,15 @@ class Test {
             task();
         }
 
-        fail = false;
-        msg = null;
+        error = null;
 
         try {
             block();
         } except (e) {
-            fail = true;
-            msg = e.message;
+            error = e;
         }
 
-        self.results[name] = (fail, msg);
+        self.results[name] = error;
 
         foreach (task in self.postTasks) {
             task();
@@ -54,40 +238,21 @@ func describe(name, block) {
     });
 
     if (failures.getSize() > 0) {
-        print('Build failed!');
+        print('Tests failed!');
         sys.exit(failures.getSize());
     }
 }
 
 func _describe(name, block, indent) {
-    indentation = '';
-    for (i = 0; i < indent; i += 1) {
-        indentation += '    ';
-    }
     testObj = Test(indent);
-    print('{}{}'.format(indentation, name));
+    FrontendManager.blockBegin(name);
     try {
         block(testObj);
     } except (e) {
-        print('{}failure in espresso! report this: {}'.format(indentation, e.message));
+        FrontendManager.espressoError(e);
     }
 
-    fails = 0;
-    foreach(test in testObj.results) {
-        result = testObj.results[test];
-        if (!result[0]) {
-            print('{}{} [✓]'.format(indentation, test));
-        } else {
-            print('{}{} [✗] - {}'.format(indentation, test, result[1]));
-            fails += 1;
-        }
-    }
-
-    print('');
-    print('{}Summary of "{}":'.format(indentation, name));
-    print('{}{} passes'.format(indentation, testObj.results.getSize() - fails));
-    print('{}{} failures'.format(indentation, fails));
-    print('');
+    FrontendManager.rootDescribeSummary(name, testObj.results);
 
     return testObj.results;
 }
