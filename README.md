@@ -5,3 +5,7 @@
 [![Build Status](https://travis-ci.org/IodineLang/espresso.svg?branch=master)](https://travis-ci.org/IodineLang/espresso)
 
 Espresso is a test framework and assertion library designed to help with test-driven development (TDD) and behaviour-driven development (BDD). The syntax is inspired by [Mocha](https://mochajs.org/) and [Chai](http://chaijs.com/).
+
+## Want to learn more?
+Visit [the Espresso site](https://iodinelang.github.io/espresso) powered by GitHub Pages for user guides, documentation and 
+more.
