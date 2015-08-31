@@ -1,11 +1,11 @@
-use HTMLFrontend, describe, expect, InvalidTestException from
+use ConciseConsoleFrontend, describe, expect, InvalidTestException from
     src.espresso;
 
 class FakeTest {
     # Test class.
 }
 
-espresso.FrontendManager.set(HTMLFrontend());
+espresso.FrontendManager.set(ConciseConsoleFrontend());
 
 describe('espresso', lambda(test) => {
     test.describe('equal', lambda(test) => {
