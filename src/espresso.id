@@ -233,9 +233,7 @@ class Test {
 
 func describe(name, block) {
     results = _describe(name, block, 1);
-    failures = filter(results, lambda(result) => {
-        return results[result] != null;
-    });
+    failures = filter(results, lambda(result) => results[result] != null);
 
     if (failures.getSize() > 0) {
         print('Tests failed!');
