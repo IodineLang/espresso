@@ -7,8 +7,8 @@ class FakeTest {
 
 espresso.FrontendManager.set(ConciseConsoleFrontend());
 
-describe('espresso', lambda(test) => {
-    test.describe('equal', lambda(test) => {
+describe('espresso', lambda(test) {
+    test.describe('equal', lambda(test) {
         test.it('should successfully compare two equal integers', lambda() {
             expect(6).to.equal(6);
         });
@@ -32,7 +32,7 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    test.describe('not', lambda(test) => {
+    test.describe('not', lambda(test) {
         test.it('should negate an equal', lambda() {
             expect(2).not().to.equal(3);
         });
@@ -43,28 +43,28 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    test.describe('to', lambda(test) => {
+    test.describe('to', lambda(test) {
         test.it('should be the same as expect', lambda() {
             e = expect(1);
             expect(e).to.equal(e.to);
         })
     });
 
-    test.describe('be', lambda(test) => {
+    test.describe('be', lambda(test) {
         test.it('should be the same as expect', lambda() {
             e = expect(1);
             expect(e).to.equal(e.be);
         })
     });
 
-    test.describe('have', lambda(test) => {
+    test.describe('have', lambda(test) {
         test.it('should be the same as expect', lambda() {
             e = expect(1);
             expect(e).to.equal(e.have);
         })
     });
 
-    test.describe('_null', lambda(test) => {
+    test.describe('_null', lambda(test) {
         test.it('should pass if object is null', lambda() {
             expect(null).to.be._null();
         });
@@ -74,7 +74,7 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    test.describe('attribute', lambda(test) => {
+    test.describe('attribute', lambda(test) {
         test.it('should pass if the object has the attribute', lambda() {
             expect('A string').to.have.attribute('substr');
         });
@@ -84,7 +84,7 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    test.describe('_true', lambda(test) => {
+    test.describe('_true', lambda(test) {
         test.it('should pass if the object is true', lambda() {
             expect(true).to.be._true();
         });
@@ -98,7 +98,7 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    test.describe('_false', lambda(test) => {
+    test.describe('_false', lambda(test) {
         test.it('should pass if the object is false', lambda() {
             expect(false).to.be._false();
         });
@@ -112,7 +112,7 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    test.describe('key', lambda(test) => {
+    test.describe('key', lambda(test) {
         test.it('should fail if the object is not a HashMap', lambda() {
             expect(1).not().to.have.key('yes');
         });
@@ -130,7 +130,7 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    test.describe('keys', lambda(test) => {
+    test.describe('keys', lambda(test) {
         test.it('should fail if the object is not a HashMap', lambda() {
             expect(1).not().to.have.keys(1, 2);
         });
@@ -140,7 +140,7 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    test.describe('a', lambda(test) => {
+    test.describe('a', lambda(test) {
         test.it('should pass if the typeDefs match', lambda() {
             expect('A string').to.be.a('Str');
         });
@@ -158,13 +158,13 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    test.describe('an', lambda(test) => {
+    test.describe('an', lambda(test) {
         test.it('should act the same as "a"', lambda() {
             expect(1).to.be.an('Int');
         });
     });
 
-    test.describe('above', lambda(test) => {
+    test.describe('above', lambda(test) {
         test.it('should pass if object is greater', lambda() {
             expect(2).to.be.above(1);
         });
@@ -178,7 +178,7 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    test.describe('below', lambda(test) => {
+    test.describe('below', lambda(test) {
         test.it('should pass if object is less', lambda() {
             expect(1).to.be.below(2);
         });
@@ -192,14 +192,14 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    test.describe('at', lambda(test) => {
+    test.describe('at', lambda(test) {
         test.it('should be the same as the Expect object', lambda() {
             e = expect(1);
             expect(e).to.equal(e.at);
         });
     });
 
-    test.describe('most', lambda(test) => {
+    test.describe('most', lambda(test) {
         test.it('should pass if object is <= value', lambda() {
             expect(5).to.be.at.most(5);
         });
@@ -213,7 +213,7 @@ describe('espresso', lambda(test) => {
         });
     });
 
-    test.describe('least', lambda(test) => {
+    test.describe('least', lambda(test) {
         test.it('should pass if object is >= value', lambda() {
             expect(5).to.be.at.least(5);
             expect(6).to.be.at.least(-1);
