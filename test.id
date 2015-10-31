@@ -150,11 +150,11 @@ describe('espresso', lambda(test) {
         });
 
         test.it('should be able to use the typeDef', lambda() {
-            expect({}).to.be.a(HashMap().typeDef);
+            expect({}).to.be.a(HashMap().__type__);
         });
 
         test.it('should work with classes', lambda() {
-            expect(FakeTest()).to.be.a(FakeTest().typeDef);
+            expect(FakeTest()).to.be.a(FakeTest().__type__);
         });
     });
 

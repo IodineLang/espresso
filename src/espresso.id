@@ -27,7 +27,7 @@ class ConciseConsoleFrontend : ConsoleFrontendBase, IFrontend {
 
     func espressoError(self, e) {
         self._print('There was a bug with espresso!');
-        self._print('{}: {}'.format(e.typeDef, e.message));
+        self._print('{}: {}'.format(e.__type__, e.message));
         self._print('{}'.format(e.stackTrace));
         sys.exit(-1);
     }
@@ -60,7 +60,7 @@ class ConsoleFrontend : ConsoleFrontendBase, IFrontend {
 
     func espressoError(self, e) {
         self._print('There was a bug with espresso!');
-        self._print('{}: {}'.format(e.typeDef, e.message));
+        self._print('{}: {}'.format(e.__type__, e.message));
         self._print('{}'.format(e.stackTrace));
         sys.exit(-1);
     }
@@ -83,7 +83,7 @@ class HTMLFrontend : ConsoleFrontendBase, IFrontend {
 
     func espressoError(self, e) {
         self._print('There was a bug with espresso!');
-        self._print('{}: {}'.format(e.typeDef, e.message));
+        self._print('{}: {}'.format(e.__type__, e.message));
         self._print('{}'.format(e.stackTrace));
         sys.exit(-1);
     }
@@ -284,7 +284,7 @@ class Expect {
     }
 
     func equal(self, value) {
-        test = self.obj.typeDef == value.typeDef && self.obj == value;
+        test = self.obj.__type__ == value.__type__ && self.obj == value;
         if (!self._runTest(test)) {
             raise AssertionException('expected {}, but got {}!'.format(value, self.obj));
         }
@@ -298,14 +298,14 @@ class Expect {
     }
 
     func _true(self) {
-        test = self.obj.typeDef == true.typeDef && self.obj == true;
+        test = self.obj.__type__ == true.__type__ && self.obj == true;
         if (!self._runTest(test)) {
             raise AssertionException('expected {} to be true'.format(self.obj));
         }
     }
 
     func _false(self) {
-        test = self.obj.typeDef == false.typeDef && self.obj == false;
+        test = self.obj.__type__ == false.__type__ && self.obj == false;
         if (!self._runTest(test)) {
             raise AssertionException('expected {} to be false'.format(self.obj));
         }
@@ -319,14 +319,14 @@ class Expect {
     }
 
     func key(self, value) {
-        test = self.obj.typeDef == {}.typeDef && self.obj.contains(value);
+        test = self.obj.__type__ == {}.__type__ && self.obj.contains(value);
         if (!self._runTest(test)) {
             raise AssertionException('expected {} to have key {}'.format(self.obj, value));
         }
     }
 
     func keys(self, *values) {
-        test = self.obj.typeDef == {}.typeDef;
+        test = self.obj.__type__ == {}.__type__;
         foreach(value in values) {
             test = test && self.obj.contains(value);
         }
@@ -338,15 +338,15 @@ class Expect {
     }
 
     func a(self, type) {
-        test = Str(self.obj.typeDef) == Str(type);
+        test = Str(self.obj.__type__) == Str(type);
         if (!self._runTest(test)) {
             raise AssertionException('expected {} to be a {}, but got {}'
-                .format(self.obj, type, self.obj.typeDef));
+                .format(self.obj, type, self.obj.__type__));
         }
     }
 
     func above(self, value) {
-        test = self.obj.typeDef == value.typeDef && self.obj > value;
+        test = self.obj.__type__ == value.__type__ && self.obj > value;
         if (!self._runTest(test)) {
             raise AssertionException('expected {} to be greater than {}'
                 .format(self.obj, value));
@@ -354,7 +354,7 @@ class Expect {
     }
 
     func below(self, value) {
-        test = self.obj.typeDef == value.typeDef && self.obj < value;
+        test = self.obj.__type__ == value.__type__ && self.obj < value;
         if (!self._runTest(test)) {
             raise AssertionException('expected {} to be less than {}'
                 .format(self.obj, value));
@@ -362,7 +362,7 @@ class Expect {
     }
 
     func least(self, value) {
-        test = self.obj.typeDef == value.typeDef && self.obj >= value;
+        test = self.obj.__type__ == value.__type__ && self.obj >= value;
         if (!self._runTest(test)) {
             raise AssertionException('expected {} to be greater/equal to {}'
                 .format(self.obj, value));
@@ -370,7 +370,7 @@ class Expect {
     }
 
     func most(self, value) {
-        test = self.obj.typeDef == value.typeDef && self.obj <= value;
+        test = self.obj.__type__ == value.__type__ && self.obj <= value;
         if (!self._runTest(test)) {
             raise AssertionException('expected {} to be less/equal to {}'
                 .format(self.obj, value));
