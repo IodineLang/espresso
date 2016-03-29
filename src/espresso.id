@@ -235,9 +235,9 @@ func describe(name, block) {
     results = _describe(name, block, 1);
     failures = filter(results, lambda(result) => results[result] != null);
 
-    if (failures.getSize() > 0) {
+    if (len(failures) > 0) {
         print('Tests failed!');
-        sys.exit(failures.getSize());
+        sys.exit(len(failures));
     }
 }
 
