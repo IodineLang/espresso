@@ -154,7 +154,7 @@ class ConsoleFrontendBase {
     }
 }
 
-interface IFrontend {
+contract IFrontend {
     func rootDescribeSummary(self, name, results);
     func espressoError(self, e);
     func blockBegin(self, name);
