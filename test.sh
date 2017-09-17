@@ -6,4 +6,5 @@ mono -V
 make
 sudo make install
 sudo make install-ion
+cd ..
 ion run
