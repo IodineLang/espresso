@@ -1,6 +1,7 @@
 script:
   - ./test.sh
 language: csharp
+sudo: required
 mono:
   - latest
 notifications:
