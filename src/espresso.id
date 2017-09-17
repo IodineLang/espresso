@@ -1,402 +1,413 @@
-use reflection;
-use sys;
-
-class ConciseConsoleFrontend : ConsoleFrontendBase, IFrontend {
-    func rootDescribeSummary(self, name, results) {
-        self.indent -= 1;
-        fails = 0;
-        foreach(test in results) {
-            result = results[test];
-            if (result != null) {
-                self._print('{} [✗] - {}'.format(test, result.message));
-                fails += 1;
-            }
-        }
-
-        passes = results.getSize() - fails;
-        if (self.indent == 0) {
-            self._print('Summary: ');
-        }
-
-        if (fails > 0) {
-            self._print('{} [{} ✓, {} ✗]'.format(name, passes, fails));
-        } else {
-            self._print('{} [{} ✓]'.format(name, passes));
-        }
-    }
-
-    func espressoError(self, e) {
-        self._print('There was a bug with espresso!');
-        self._print('{}: {}'.format(e.__type__, e.message));
-        self._print('{}'.format(e.stackTrace));
-        sys.exit(-1);
-    }
-
-    func blockBegin(self, name) {
-        self.indent += 1;
-    }
-}
-
-class ConsoleFrontend : ConsoleFrontendBase, IFrontend {
-    func rootDescribeSummary(self, name, results) {
-        self.indent -= 1;
-        fails = 0;
-        foreach(test in results) {
-            result = results[test];
-            if (result == null) {
-                self._print('{} [✓]'.format(test));
-            } else {
-                self._print('{} [✗] - {}'.format(test, result.message));
-                fails += 1;
-            }
-        }
-
-        self._print('');
-        self._print('Summary of "{}":'.format(name));
-        self._print('{} passes'.format(results.getSize() - fails));
-        self._print('{} failures'.format(fails));
-        self._print('');
-    }
-
-    func espressoError(self, e) {
-        self._print('There was a bug with espresso!');
-        self._print('{}: {}'.format(e.__type__, e.message));
-        self._print('{}'.format(e.stackTrace));
-        sys.exit(-1);
-    }
-
-    func blockBegin(self, name) {
-        self._print('{}:'.format(name));
-        self.indent += 1;
-    }
-}
-
-class HTMLFrontend : ConsoleFrontendBase, IFrontend {
-    func HTMLFrontend(self) {
-        super();
-        self.output = '';
-    }
-
-    func blockBegin(self, name) {
-        self.indent += 1;
-    }
-
-    func espressoError(self, e) {
-        self._print('There was a bug with espresso!');
-        self._print('{}: {}'.format(e.__type__, e.message));
-        self._print('{}'.format(e.stackTrace));
-        sys.exit(-1);
-    }
-
-    func rootDescribeSummary(self, name, results) {
-        self.indent -= 1;
-        if (self.indent == 0) {
-            f = open('{}.html'.format(name), 'w');
-            data = '<!DOCTYPE html><html>';
-            data += '<head><title>Results for {}</title>'.format(name);
-            data += '<link href="https://maxcdn.bootstrapcdn.com/bootstrap/' +
-                '3.3.5/css/bootstrap.min.css" rel="stylesheet">';
-            data += '</head><body><div class="container">{}</div></body></html>'
-                .format(self.output);
-            f.write(data);
-            f.close();
-        } else {
-            self.output += '<h1>{}'.format(name);
-            self.output += '</h1>';
-            self.output += '<table class="table"><thead><th>Test</th>';
-            self.output += '<th>Result</th></thead>';
-            self.output += '<tbody>';
-            foreach (result in results) {
-                cls = 'success';
-                if (results[result] != null) {
-                    cls = 'danger';
-                }
-
-                self.output += '<tr class="{}">'.format(cls);
-                self.output += '<td>{}</td>'.format(result);
-                e = results[result];
-                if (e != null) {
-                    self.output += '<td>{} - {}<br> Stack: {}</td>'
-                        .format(e, e.message, e.stackTrace
-                        .replace('\n', '<br>'));
-                } else {
-                    self.output += '<td>Passed</td>';
-                }
-                self.output += '</tr>';
-            }
-
-            self.output += '</tbody></table>';
-        }
-    }
-}
+/**
+ * Iodine unit testing library (Espesso)
+ * https://github.com/IodineLang/espresso
+ * @author Aurora01
+ * @license MIT
+ */
+ 
+use sys
+use inspect
 
 class ConsoleFrontendBase {
-    func ConsoleFrontendBase(self) {
-        self.indent = 0;
+    func ConsoleFrontendBase (self) {
+        self.indent = 0
     }
 
-    func _print(self, message) {
-        indentation = '';
-        for (i = 0; i < self.indent; i += 1) {
-            indentation += '    ';
+    func _print (self, message) {
+        indentation = ''
+        for i in 0 .. self.indent {
+            indentation += '    '
         }
 
-        print('{}{}'.format(indentation, message));
+        print('{}{}'.format(indentation, message))
     }
 
-    func _printIndent(self) {
-        indentation = '';
-        for (i = 0; i < self.indent; i += 1) {
-            indentation += '    ';
+    func _printIndent (self) {
+        indentation = ''
+        for i in 0 .. self.indent {
+            indentation += '    '
         }
 
-        stdout.write(indentation);
+        stdout.write (indentation)
     }
 }
 
 contract IFrontend {
-    func rootDescribeSummary(self, name, results);
-    func espressoError(self, e);
-    func blockBegin(self, name);
+    func rootDescribeSummary(self, name, results)
+    func espressoError(self, e)
+    func blockBegin(self, name)
 }
+
+class ConciseConsoleFrontend extends ConsoleFrontendBase implements IFrontend {
+    func rootDescribeSummary (self, name, results) {
+        self.indent -= 1
+        fails = 0
+        for test, result in results {
+            if result != null {
+                self._print ('{} [✗] - {}'.format (test, result.message))
+                fails += 1
+            }
+        }
+
+        passes = len (results) - fails
+        if self.indent == 0 {
+            self._print('Summary: ')
+        }
+
+        if fails > 0 {
+            self._print('{} [{} ✓, {} ✗]'.format(name, passes, fails))
+        } else {
+            self._print('{} [{} ✓]'.format(name, passes))
+        }
+    }
+
+    func espressoError (self, e) {
+        self._print ('There was a bug with espresso!')
+        self._print ('{}: {}'.format(type(e), e.message))
+        self._print ('{}'.format(e.stackTrace))
+        sys.exit (-1)
+    }
+
+    func blockBegin(self, name) {
+        self.indent += 1
+    }
+}
+
+class ConsoleFrontend extends ConsoleFrontendBase implements IFrontend {
+    func rootDescribeSummary (self, name, results) {
+        self.indent -= 1
+        fails = 0
+        for test, result in results {
+            if (result == null) {
+                self._print ('{} [✓]'.format(test))
+            } else {
+                self._print ('{} [✗] - {}'.format(test, result.message))
+                fails += 1
+            }
+        }
+
+        self._print ('')
+        self._print ('Summary of "{}":'.format(name))
+        self._print ('{} passes'.format(results.getSize() - fails))
+        self._print ('{} failures'.format(fails))
+        self._print ('')
+    }
+
+    func espressoError (self, e) {
+        self._print ('There was a bug with espresso!')
+        self._print ('{}: {}'.format(type(e), e.message))
+        self._print ('{}'.format(e.stackTrace))
+        sys.exit (-1)
+    }
+
+    func blockBegin (self, name) {
+        self._print ('{}:'.format(name))
+        self.indent += 1
+    }
+}
+
+class HTMLFrontend extends ConsoleFrontendBase implements IFrontend {
+    func HTMLFrontend (self) {
+        super ()
+        self.output = ''
+    }
+
+    func blockBegin (self, name) {
+        self.indent += 1
+    }
+
+    func espressoError (self, e) {
+        self._print ('There was a bug with espresso!')
+        self._print ('{}: {}'.format(type(e), e.message))
+        self._print ('{}'.format(e.stackTrace))
+        sys.exit(-1)
+    }
+
+    func rootDescribeSummary (self, name, results) {
+        self.indent -= 1
+        if self.indent == 0 {
+            with f = open ('{}.html'.format(name), 'w') {
+                data = '<!DOCTYPE html><html>'
+                data += '<head><title>Results for {}</title>'.format(name)
+                data += '<link href="https://maxcdn.bootstrapcdn.com/bootstrap/' +
+                    '3.3.5/css/bootstrap.min.css" rel="stylesheet">'
+                data += '</head><body><div class="container">{}</div></body></html>'
+                    .format(self.output)
+                f.write(data)
+            }
+        } else {
+            self.output += '<h1>{}'.format(name)
+            self.output += '</h1>'
+            self.output += '<table class="table"><thead><th>Test</th>'
+            self.output += '<th>Result</th></thead>'
+            self.output += '<tbody>'
+            for result in results {
+                cls = 'success'
+                if (results[result] != null) {
+                    cls = 'danger'
+                }
+
+                self.output += '<tr class="{}">'.format(cls)
+                self.output += '<td>{}</td>'.format(result)
+                e = results[result]
+                if e != null {
+                    self.output += '<td>{} - {}<br> Stack: {}</td>'
+                        .format(e, e.message, e.stackTrace
+                        .replace('\n', '<br>'))
+                } else {
+                    self.output += '<td>Passed</td>'
+                }
+                self.output += '</tr>'
+            }
+
+            self.output += '</tbody></table>'
+        }
+    }
+}
+
+
 
 class FrontendManager {
     func _get() {
         try {
-            return FrontendManager.frontend;
+            return FrontendManager.frontend
         } except (e as AttributeNotFoundException) {
-            FrontendManager.frontend = ConsoleFrontend();
-            return FrontendManager.frontend;
+            FrontendManager.frontend = ConsoleFrontend()
+            return FrontendManager.frontend
         }
     }
 
     func set(clazz) {
-        FrontendManager.frontend = clazz;
+        FrontendManager.frontend = clazz
     }
 
     func rootDescribeSummary(name, results) {
-        FrontendManager._get().rootDescribeSummary(name, results);
+        FrontendManager._get().rootDescribeSummary(name, results)
     }
 
     func espressoError(e) {
-        FrontendManager._get().espressoError(e);
+        FrontendManager._get().espressoError(e)
     }
 
     func blockBegin(name) {
-        FrontendManager._get().blockBegin(name);
+        FrontendManager._get().blockBegin(name)
     }
 }
 
 class Test {
     func Test(self, indentLevel) {
-        self.results = {};
-        self.preTasks = [];
-        self.postTasks = [];
-        self.indentLevel = indentLevel;
+        self.results = Dict()
+        self.preTasks = []
+        self.postTasks = []
+        self.indentLevel = indentLevel
     }
 
     func describe(self, name, block) {
-        results = _describe(name, block, self.indentLevel + 1);
-        foreach (result in results) {
-            self.results['{} {}'.format(name, result)] = results[result];
+        results = _describe(name, block, self.indentLevel + 1)
+        for key, value in results {
+            self.results['{} {}'.format(name, key)] = results[key]
         }
     }
 
-    func it(self, name, block) {
-        foreach (task in self.preTasks) {
-            task();
+    func it (self, name, block) {
+        for task in self.preTasks {
+            task()
         }
 
-        error = null;
+        error = null
 
         try {
-            block();
+            block ()
         } except (e) {
-            error = e;
+            error = e
         }
 
-        self.results[name] = error;
+        self.results[name] = error
 
-        foreach (task in self.postTasks) {
-            task();
+        for task in self.postTasks {
+            task ()
         }
     }
 
-    func beforeEach(self, block) {
-        self.preTasks.add(block);
+    func beforeEach (self, block) {
+        self.preTasks.append (block)
     }
 
-    func afterEach(self, block) {
-        self.postTasks.add(block);
+    func afterEach (self, block) {
+        self.postTasks.append (block)
     }
 }
 
-func describe(name, block) {
-    results = _describe(name, block, 1);
-    failures = filter(results, lambda(result) => results[result] != null);
-
-    if (len(failures) > 0) {
-        print('Tests failed!');
-        sys.exit(len(failures));
+func describe (name, block) {
+    results = _describe (name, block, 1)
+    failures = filter (results, lambda(result) => results[result [0]] isnot Null)
+    if failures isnot Null && len(failures) > 0 {
+        print('Tests failed!')
+        sys.exit (len(failures))
     }
 }
 
-func _describe(name, block, indent) {
-    testObj = Test(indent);
-    FrontendManager.blockBegin(name);
+func _describe (name, block, indent) {
+    testObj = Test (indent)
+    FrontendManager.blockBegin (name)
     try {
-        block(testObj);
+        block(testObj)
     } except (e) {
-        FrontendManager.espressoError(e);
+        FrontendManager.espressoError (e)
     }
 
-    FrontendManager.rootDescribeSummary(name, testObj.results);
+    FrontendManager.rootDescribeSummary (name, testObj.results)
 
-    return testObj.results;
+    return testObj.results
 }
 
-class AssertionException : Exception {
-    func AssertionException(self, message) {
-        super(message);
+class AssertionException extends Exception {
+    func AssertionException (self, message) {
+        super (message)
     }
 }
 
-class InvalidTestException : Exception {
-    func InvalidTestException(self, message) {
-        super('INVALID TEST - {}'.format(message));
+class InvalidTestException extends Exception {
+    func InvalidTestException (self, message) {
+        super('INVALID TEST - {}'.format(message))
     }
 }
 
 class Expect {
-    func Expect(self, obj) {
-        self.obj = obj;
+    func Expect (self, obj) {
+        self.obj = obj
         # .to doesn't actually do anything
-        self.to = self;
-        self.be = self;
-        self.have = self;
-        self.at = self;
-        self.negateFlag = false;
+        self.to = self
+        self.be = self
+        self.have = self
+        self.at = self
+        self.negateFlag = false
     }
 
-    func not(self) {
-        self.negateFlag = true;
-        return self;
+    func not (self) {
+        self.negateFlag = true
+        return self
     }
 
-    func equal(self, value) {
-        test = self.obj.__type__ == value.__type__ && self.obj == value;
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {}, but got {}!'.format(value, self.obj));
+    func equal (self, value) {
+        test = type(self.obj) == type(value) && self.obj == value
+        if !self._runTest(test) {
+            raise AssertionException ('expected {}, but got {}!'.format(value, self.obj))
         }
     }
 
-    func attribute(self, attr) {
-        test = reflection.hasAttribute(self.obj, attr);
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {} to have attribute {}'.format(self.obj, attr));
+    func attribute (self, attr) {
+        test = inspect.hasattribute (self.obj, attr)
+        if !self._runTest(test) {
+            raise AssertionException ('expected {} to have attribute {}'.format(self.obj, attr))
         }
     }
 
-    func _true(self) {
-        test = self.obj.__type__ == true.__type__ && self.obj == true;
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {} to be true'.format(self.obj));
+    func _true (self) {
+        test = self.obj == true
+
+        if !self._runTest(test) {
+            raise AssertionException ('expected {} to be true'.format(self.obj))
         }
     }
 
     func _false(self) {
-        test = self.obj.__type__ == false.__type__ && self.obj == false;
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {} to be false'.format(self.obj));
+        test = self.obj == false
+        if !self._runTest (test) {
+            raise AssertionException('expected {} to be false'.format(self.obj))
         }
     }
 
-    func _null(self) {
-        test = self.obj == null;
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {} to be null or undefined'.format(self.obj));
+    func _null (self) {
+        test = self.obj == null
+        if !self._runTest (test) {
+            raise AssertionException('expected {} to be null or undefined'.format(self.obj))
         }
     }
 
-    func key(self, value) {
-        test = self.obj.__type__ == {}.__type__ && self.obj.contains(value);
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {} to have key {}'.format(self.obj, value));
+    func key (self, value) {
+        test = self.obj is Dict &&
+               self.obj.contains(value)
+        if !self._runTest(test) {
+            raise AssertionException('expected {} to have key {}'.format(self.obj, value))
         }
     }
 
-    func keys(self, *values) {
-        test = self.obj.__type__ == {}.__type__;
-        foreach(value in values) {
-            test = test && self.obj.contains(value);
+    func keys (self, *values) {
+        test = self.obj is Dict
+        for value in values {
+            test = test && self.obj.contains(value)
         }
 
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {} to have keys [{}]'
-                .format(self.obj, ', '.join(values)));
+        if !self._runTest (test) {
+            raise AssertionException ('expected {} to have keys [{}]'
+                .format(self.obj, ', '.join (values)))
         }
     }
 
-    func a(self, type) {
-        test = Str(self.obj.__type__) == Str(type);
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {} to be a {}, but got {}'
-                .format(self.obj, type, self.obj.__type__));
+    func a(self, _type) {
+        test = Str(type(self.obj)) == Str(_type)
+        if !self._runTest(test) {
+            raise AssertionExceptioni ('expected {} to be a {}, but got {}'
+                .format(self.obj, _type, type(self.obj)))
         }
     }
 
     func above(self, value) {
-        test = self.obj.__type__ == value.__type__ && self.obj > value;
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {} to be greater than {}'
-                .format(self.obj, value));
+        test = type (self.obj) == type (value) &&
+               self.obj > value
+        if !self._runTest (test) {
+            raise AssertionException ('expected {} to be greater than {}'
+                .format (self.obj, value))
         }
     }
 
-    func below(self, value) {
-        test = self.obj.__type__ == value.__type__ && self.obj < value;
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {} to be less than {}'
-                .format(self.obj, value));
+    func below (self, value) {
+        test = type (self.obj) == type(value) &&
+               self.obj < value
+        if !self._runTest (test) {
+            raise AssertionExceptioni ('expected {} to be less than {}'
+                .format (self.obj, value))
         }
     }
 
-    func least(self, value) {
-        test = self.obj.__type__ == value.__type__ && self.obj >= value;
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {} to be greater/equal to {}'
-                .format(self.obj, value));
+    func least (self, value) {
+        test = type(self.obj) == type(value) && self.obj >= value
+        if !self._runTest (test) {
+            raise AssertionException ('expected {} to be greater/equal to {}'
+                .format (self.obj, value))
         }
     }
 
-    func most(self, value) {
-        test = self.obj.__type__ == value.__type__ && self.obj <= value;
-        if (!self._runTest(test)) {
-            raise AssertionException('expected {} to be less/equal to {}'
-                .format(self.obj, value));
+    func most (self, value) {
+        test = type (self.obj) == type (value) &&
+               self.obj <= value
+        if !self._runTest(test) {
+            raise AssertionException ('expected {} to be less/equal to {}'
+                .format (self.obj, value))
         }
     }
 
-    func an(self, type) {
-        self.a(type);
+    func an (self, _type) {
+        self.a (_type)
     }
 
-    func _runTest(self, test) {
+    func _runTest (self, test) {
         # True == pass
         # False == fail
 
-        if (self.negateFlag) {
-            test = !test;
+        if self.negateFlag {
+            test = !test
         }
 
-        if (test) {
-            return true;
+        if test {
+            return true
         }
 
-        return false;
+        return false
     }
 }
 
 func expect(obj) {
-    return Expect(obj);
+    return Expect (obj)
 }

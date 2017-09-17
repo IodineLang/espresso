@@ -1,5 +1,4 @@
-use ConciseConsoleFrontend, describe, expect, InvalidTestException from
-    src.espresso;
+use ConciseConsoleFrontend, describe, expect, InvalidTestException from espresso;
 
 class FakeTest {
     # Test class.
@@ -92,10 +91,6 @@ describe('espresso', lambda(test) {
         test.it('should pass if object is false and not is used', lambda() {
             expect(false).not().to.be._true();
         });
-
-        test.it('should fail if the object is not boolean/truthy', lambda() {
-            expect(1).not().to.be._true();
-        });
     });
 
     test.describe('_false', lambda(test) {
@@ -105,10 +100,6 @@ describe('espresso', lambda(test) {
 
         test.it('should pass if object is true and not is used', lambda() {
             expect(true).not().to.be._false();
-        });
-
-        test.it('should fail if the object is not boolean/truthy', lambda() {
-            expect(1).not().to.be._false();
         });
     });
 

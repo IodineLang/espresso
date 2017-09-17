@@ -1,5 +1,1 @@
-{
-    "sources": [
-        "src"
-    ]
-}
+{"entrypoint" : "src/test.id","sources" : ["src"],"dependencyLocation" : "src","dependencies" : {},"packageName" : "Espresso"}
